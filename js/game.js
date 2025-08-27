@@ -11,7 +11,7 @@ var game = {
   // ===========================================
   
   // Game state
-  language: window.location.hash.substring(1) || 'en',
+  language: window.location.hash.substring(1) || 'id',
   level: parseInt(localStorage.level, 10) || 0,
   answers: (localStorage.answers && JSON.parse(localStorage.answers)) || {},
   solved: (localStorage.solved && JSON.parse(localStorage.solved)) || [],
