@@ -2,7 +2,7 @@ var levels = [
   {
     name: 'Q1',
     instructions: {
-      'id': '<p>Selamat datang di Spaceflex, sebuah game di mana Anda membantu Alien dan teman-temannya dengan menulis kode CSS! Arahkan alien ini ke planet di sebelah kanan dengan menggunakan properti <code>justify-content</code>, yang menyelaraskan item secara horizontal dan menerima nilai-nilai berikut:</p><ul><li><code>flex-start</code>: Item menyelaras ke sisi kiri kontainer.</li><li><code>flex-end</code>: Item menyelaras ke sisi kanan kontainer.</li><li><code>center</code>: Item menyelaras di tengah kontainer.</li><li><code>space-between</code>: Item ditampilkan dengan jarak yang sama di antara mereka.</li><li><code>space-around</code>: Item ditampilkan dengan jarak yang sama di sekitar mereka.</li></ul><p>Contohnya, <code>justify-content: flex-end;</code> akan memindahkan alien ke kanan. <img src="https://code.org/api/hour/begin_flexbox_froggy.png"></p>',
+      'id': '<p>Selamat datang di Spaceflex, sebuah game di mana Anda membantu Alien dan teman-temannya dengan menulis kode CSS! Arahkan alien ini ke planet di sebelah kanan dengan menggunakan properti <code>justify-content</code>, yang menyelaraskan item secara horizontal dan menerima nilai-nilai berikut:</p><ul><li><code>flex-start</code>: Item menyelaras ke sisi kiri kontainer.</li><li><code>flex-end</code>: Item menyelaras ke sisi kanan kontainer.</li><li><code>center</code>: Item menyelaras di tengah kontainer.</li><li><code>space-between</code>: Item ditampilkan dengan jarak yang sama di antara mereka.</li><li><code>space-around</code>: Item ditampilkan dengan jarak yang sama di sekitar mereka.</li></ul><p>Contohnya, <code>justify-content: flex-end;</code> akan memindahkan alien ke kanan.</p>',
     },
     board: 'g',
     style: { 'justify-content': 'flex-end' },
@@ -211,9 +211,9 @@ var levels = [
       'id': '<p>Alien-alien tersebar di seluruh galaxy, tetapi planet-planet berkumpul di bagian atas. Anda dapat menggunakan <code>align-content</code> untuk mengatur bagaimana beberapa baris dipisahkan satu sama lain. Properti ini menerima nilai-nilai berikut:</p><ul><li><code>flex-start</code>: Baris dikemas di bagian atas kontainer.</li><li><code>flex-end</code>: Baris dikemas di bagian bawah kontainer.</li><li><code>center</code>: Baris dikemas di pusat vertikal kontainer.</li><li><code>space-between</code>: Baris ditampilkan dengan jarak yang sama di antara mereka.</li><li><code>space-around</code>: Baris ditampilkan dengan jarak yang sama di sekitar mereka.</li><li><code>stretch</code>: Baris diregangkan untuk menyesuaikan kontainer.</li></ul><p>Ini bisa membingungkan, tetapi <code>align-content</code> menentukan jarak antara baris, sedangkan <code>align-items</code> menentukan bagaimana item secara keseluruhan diselaraskan dalam kontainer. Ketika hanya ada satu baris, <code>align-content</code> tidak berpengaruh.</p>',
     },
     board: 'ggggggggggggggg',
-    classes: { '#galaxy, #background': 'wrap' },
+    classes: { '#pond, #background': 'wrap' },
     style: { 'align-content': 'flex-start' },
-    before: "#galaxy {\n  display: flex;\n  flex-wrap: wrap;\n",
+    before: "#pond {\n  display: flex;\n  flex-wrap: wrap;\n",
     after: "}"
   },
   {
@@ -222,9 +222,9 @@ var levels = [
       'id': '<p>Sekarang arus telah mengumpulkan planet-planet di bagian bawah. Gunakan <code>align-content</code> untuk membimbing alien ke sana.</p>',
     },
     board: 'ggggggggggggggg',
-    classes: { '#galaxy, #background': 'wrap' },
+    classes: { '#pond, #background': 'wrap' },
     style: { 'align-content': 'flex-end' },
-    before: "#galaxy {\n  display: flex;\n  flex-wrap: wrap;\n",
+    before: "#pond {\n  display: flex;\n  flex-wrap: wrap;\n",
     after: "}"
   },
   {
@@ -233,9 +233,9 @@ var levels = [
       'id': '<p>Alien-alien telah mengadakan pesta, tetapi sekarang saatnya pulang. Gunakan kombinasi <code>flex-direction</code> dan <code>align-content</code> untuk membawa mereka ke planet mereka.</p>',
     },
     board: 'rgggyrgggyrgggy',
-    classes: { '#galaxy, #background': 'wrap' },
+    classes: { '#pond, #background': 'wrap' },
     style: { 'flex-direction': 'column-reverse', 'align-content': 'center' },
-    before: "#galaxy {\n  display: flex;\n  flex-wrap: wrap;\n",
+    before: "#pond {\n  display: flex;\n  flex-wrap: wrap;\n",
     after: "}"
   },
   {
