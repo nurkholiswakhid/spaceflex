@@ -8,8 +8,8 @@ var messages = {
     'id': 'Lanjut',
   },
   labelFooter: {
-    'en': 'Spaceflex Froggy is created by',
-    'id': 'Spaceflex Froggy dibuat oleh',
+    'en': 'Spaceflex is created by',
+    'id': 'Spaceflex dibuat oleh',
   },
   labelLevel: {
     'en': 'Level',
