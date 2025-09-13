@@ -419,7 +419,36 @@
             overflow-x: auto;
             white-space: pre-wrap;
         }
+        
+        .cta-handout {
+        text-align: center;
+        margin-top: 2rem;
+        }
 
+        .btn.btn-secondary {
+        display: inline-block;
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        color: #fff;
+        padding: 0.8rem 1.6rem;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: bold;
+        text-decoration: none;
+        box-shadow: 0 4px 15px rgba(106, 17, 203, 0.4);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn.btn-secondary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(106, 17, 203, 0.6);
+        }
+
+        .pdf-viewer {
+        margin-top: 1rem;
+        border: 2px solid #6a11cb;
+        border-radius: 10px;
+        overflow: hidden;
+        }
 
         
         .feature-card {
@@ -451,6 +480,14 @@
             margin-bottom: 1rem;
             color: #ff00ff;
         }
+
+        .features-grid2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* hanya 2 kolom */
+        gap: 2rem;
+        margin-top: 2rem;
+        }
+
         
         /* Footer */
         .footer {

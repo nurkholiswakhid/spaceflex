@@ -79,7 +79,6 @@
         </div>
     </section>
     
-    <!-- Features Section -->
    <!-- Features Section -->
 <section class="features" id="features">
   <div class="container">
@@ -147,33 +146,37 @@
         </p>
       </div>
 
-      <!-- Feature: flex-flow -->
-      <div class="feature-card" data-modal="flex-flow">
-        <h3>flex-flow</h3>
-        <p>
-          flex-flow adalah shorthand untuk menggabungkan flex-direction dan flex-wrap,
-          sehingga arah dan pembungkusan bisa diatur sekaligus.
-        </p>
-      </div>
-
-      <!-- Feature: align-content -->
-      <div class="feature-card" data-modal="align-content">
-        <h3>align-content</h3>
-        <p>
-          align-content mengatur posisi beberapa baris item pada cross axis saat ada lebih dari satu baris,
-          contohnya menempatkan baris di awal, tengah, atau menyebar rata (space-around).
-        </p>
-      </div>
-      <div class="feature-card" data-modal="handout">
-        <h3>Handout</h3>
-        <p>
-          
-        </p>
-      </div>
-
     </div>
+
+    <div class="features-grid2">
+        <!-- Feature: flex-flow -->
+        <div class="feature-card" data-modal="flex-flow">
+            <h3>flex-flow</h3>
+            <p>
+            flex-flow adalah shorthand untuk menggabungkan flex-direction dan flex-wrap,
+            sehingga arah dan pembungkusan bisa diatur sekaligus.
+            </p>
+        </div>
+
+        <!-- Feature: align-content -->
+        <div class="feature-card" data-modal="align-content">
+            <h3>align-content</h3>
+            <p>
+            align-content mengatur posisi beberapa baris item pada cross axis saat ada lebih dari satu baris,
+            contohnya menempatkan baris di awal, tengah, atau menyebar rata (space-around).
+            </p>
+        </div>
+        </div>
   </div>
+      <div class="cta-handout">
+        <a data-modal="handout" class="btn btn-secondary">
+            📖 Lihat Modul Belajar
+        </a>
+    </div>
+
+
 </section>
+
 
  <!-- Modals -->
     <div id="modal-justify-content" class="modal">
@@ -188,7 +191,7 @@
     <div id="modal-align-items" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>justify-content</h2>
+            <h2>align-items</h2>
         
             <p><strong>🚀 Tip Space Explorer:</strong> Gunakan justify-content untuk mengatur posisi horizontal pesawat luar angkasa Anda di layar!</p>
         </div>
@@ -197,7 +200,7 @@
     <div id="modal-flex-direction" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>justify-content</h2>
+            <h2>flex-direction</h2>
         
             <p><strong>🚀 Tip Space Explorer:</strong> Gunakan justify-content untuk mengatur posisi horizontal pesawat luar angkasa Anda di layar!</p>
         </div>
@@ -206,7 +209,7 @@
     <div id="modal-order" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>justify-content</h2>
+            <h2>order</h2>
         
             <p><strong>🚀 Tip Space Explorer:</strong> Gunakan justify-content untuk mengatur posisi horizontal pesawat luar angkasa Anda di layar!</p>
         </div>
@@ -215,7 +218,7 @@
     <div id="modal-align-self" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>justify-content</h2>
+            <h2>align-self</h2>
         
             <p><strong>🚀 Tip Space Explorer:</strong> Gunakan justify-content untuk mengatur posisi horizontal pesawat luar angkasa Anda di layar!</p>
         </div>
@@ -224,7 +227,7 @@
     <div id="modal-flex-wrap" class="modal">        
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>justify-content</h2>
+            <h2>flex-wrap</h2>
         
             <p><strong>🚀 Tip Space Explorer:</strong> Gunakan justify-content untuk mengatur posisi horizontal pesawat luar angkasa Anda di layar!</p>
         </div>
@@ -233,7 +236,7 @@
     <div id="modal-flex-flow" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>justify-content</h2>
+            <h2>flex-flow</h2>
         
             <p><strong>🚀 Tip Space Explorer:</strong> Gunakan justify-content untuk mengatur posisi horizontal pesawat luar angkasa Anda di layar!</p>
         </div>
@@ -242,20 +245,34 @@
     <div id="modal-align-content" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>justify-content</h2>
+            <h2>align-content</h2>
         
             <p><strong>🚀 Tip Space Explorer:</strong> Gunakan justify-content untuk mengatur posisi horizontal pesawat luar angkasa Anda di layar!</p>
         </div>
     </div>
 
-    <div id="modal-handout" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>justify-content</h2>
-        
-            <p><strong>🚀 Tip Space Explorer:</strong> Gunakan justify-content untuk mengatur posisi horizontal pesawat luar angkasa Anda di layar!</p>
-        </div>
+<div id="modal-handout" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>📖 Modul Belajar Flexbox</h2>
+    <p>
+      🚀 Jelajahi ringkasan materi Flexbox lengkap untuk memperkuat pemahamanmu.
+      Kamu bisa gunakan modul ini sebagai panduan cepat saat bermain game Spaceflex.
+    </p>
+
+    <!-- Tampilkan PDF langsung -->
+    <div class="pdf-viewer">
+      <iframe src="handout.pdf" width="100%" height="500px"></iframe>
     </div>
+
+    <!-- Tombol unduh tetap ada -->
+    <a href="handout.pdf" target="_blank" class="btn btn-primary" style="margin-top:1rem; display:inline-block;">
+      Unduh Modul PDF
+    </a>
+  </div>
+</div>
+
+
 
 
    
@@ -335,13 +352,7 @@
             });
         });
         
-        // Parallax effect for hero elements
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const parallax = document.querySelector('.hero');
-            const speed = scrolled * 0.5;
-            parallax.style.transform = `translateY(${speed}px)`;
-        });
+
         
         // Initialize when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
@@ -370,9 +381,9 @@
             const modals = document.querySelectorAll('.modal');
             const closeButtons = document.querySelectorAll('.close');
 
-            // Open modal when feature card is clicked
-            featureCards.forEach(card => {
-                card.addEventListener('click', function() {
+            // Open modal when any element with data-modal is clicked
+            document.querySelectorAll('[data-modal]').forEach(el => {
+                el.addEventListener('click', function() {
                     const modalId = this.getAttribute('data-modal');
                     const modal = document.getElementById(`modal-${modalId}`);
                     if (modal) {
@@ -381,6 +392,8 @@
                     }
                 });
             });
+
+
 
             // Close modal when X button is clicked
             closeButtons.forEach(closeBtn => {
