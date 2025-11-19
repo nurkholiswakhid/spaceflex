@@ -1,0 +1,12 @@
+# Force HTTPS and redirect bare domain to www
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  
+  # Redirect bare domain to www
+  RewriteCond %{HTTP_HOST} ^spaceflex\.space$ [NC]
+  RewriteRule ^(.*)$ https://www.spaceflex.space/$1 [L,R=301]
+  
+  # Force HTTPS
+  RewriteCond %{HTTPS} off
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
