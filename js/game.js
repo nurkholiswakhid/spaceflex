@@ -3,6 +3,30 @@
  * A web-based game for learning CSS with timer functionality
  */
 
+// Ensure SweetAlert2 is available
+function ensureSweetAlert() {
+  return new Promise((resolve, reject) => {
+    if (typeof Swal !== 'undefined') {
+      resolve(true);
+    } else {
+      console.warn('SweetAlert2 not yet loaded, waiting...');
+      let attempts = 0;
+      const checkInterval = setInterval(() => {
+        if (typeof Swal !== 'undefined') {
+          clearInterval(checkInterval);
+          console.log('SweetAlert2 is now available');
+          resolve(true);
+        }
+        attempts++;
+        if (attempts > 50) { // 5 seconds timeout
+          clearInterval(checkInterval);
+          console.error('SweetAlert2 failed to load');
+          reject(false);
+        }
+      }, 100);
+    }
+  });
+}
 
 var game = {
   
@@ -165,14 +189,47 @@ var game = {
   /**
    * Show player input popup
    */
-  showInputPopup: function() {
+  showInputPopup: async function() {
     const savedName = localStorage.getItem('playerName');
     const savedAbsence = localStorage.getItem('playerAbsence');
 
     if (!savedName || !savedAbsence) {
-      // Check if Swal is available
-      if (typeof Swal === 'undefined') {
-        console.error('SweetAlert2 is not loaded!');
+      try {
+        await ensureSweetAlert();
+        
+        Swal.fire({
+          title: 'Welcome!',
+          html: `
+            <input id="nameInput" class="swal2-input" placeholder="Enter your name" value="${savedName || ''}">
+            <input id="absenceInput" class="swal2-input" placeholder="Enter your absence number" value="${savedAbsence || ''}">
+          `,
+          confirmButtonText: 'Start Game',
+          focusConfirm: false,
+          allowOutsideClick: false,
+          customClass: {
+            confirmButton: 'swal2-biru-btn'
+          },
+          preConfirm: () => {
+            const playerName = document.getElementById('nameInput').value;
+            const playerAbsence = document.getElementById('absenceInput').value;
+
+            if (!playerName || !playerAbsence) {
+              Swal.showValidationMessage('Name and absence number are required!');
+              return false;
+            }
+
+            localStorage.setItem('playerName', playerName);
+            localStorage.setItem('playerAbsence', playerAbsence);
+            location.reload();
+            return true;
+          }
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.initializeGame();
+          }
+        });
+      } catch (error) {
+        console.error('SweetAlert2 error:', error);
         // Fallback to simple prompt
         const name = prompt('Enter your name:');
         const absence = prompt('Enter your absence number:');
@@ -181,40 +238,7 @@ var game = {
           localStorage.setItem('playerAbsence', absence);
           location.reload();
         }
-        return;
       }
-
-      Swal.fire({
-        title: 'Welcome!',
-        html: `
-          <input id="nameInput" class="swal2-input" placeholder="Enter your name" value="${savedName || ''}">
-          <input id="absenceInput" class="swal2-input" placeholder="Enter your absence number" value="${savedAbsence || ''}">
-        `,
-        confirmButtonText: 'Start Game',
-        focusConfirm: false,
-        allowOutsideClick: false,
-        customClass: {
-          confirmButton: 'swal2-biru-btn'
-        },
-        preConfirm: () => {
-          const playerName = document.getElementById('nameInput').value;
-          const playerAbsence = document.getElementById('absenceInput').value;
-
-          if (!playerName || !playerAbsence) {
-            Swal.showValidationMessage('Name and absence number are required!');
-            return false;
-          }
-
-          localStorage.setItem('playerName', playerName);
-          localStorage.setItem('playerAbsence', playerAbsence);
-          location.reload();
-          return true;
-        }
-      }).then((result) => {
-        if (result.isConfirmed) {
-          this.initializeGame();
-        }
-      });
     } else {
       this.initializeGame();
     }
@@ -281,7 +305,12 @@ var game = {
     // Check if Swal is available
     if (typeof Swal === 'undefined') {
         console.error('SweetAlert2 is not loaded for results!');
-        alert(`Quiz Results\n\nPlayer: ${playerName}\nScore: ${score}%\nCorrect: ${correctAnswers}/${totalQuestions}`);
+        // Wait for SweetAlert2 to load
+        ensureSweetAlert().then(() => {
+            this.showResults();
+        }).catch(() => {
+            alert(`Quiz Results\n\nPlayer: ${playerName}\nScore: ${score}%\nCorrect: ${correctAnswers}/${totalQuestions}`);
+        });
         return;
     }
 
