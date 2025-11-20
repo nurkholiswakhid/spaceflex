@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spaceflex - Dependency Check</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #333;
+        }
+        .status.ok {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        .status.error {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+        .status.warn {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+        h1 {
+            color: #333;
+        }
+        code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Spaceflex Dependency Check</h1>
+    
+    <div id="status-container">
+        <p>Checking dependencies...</p>
+    </div>
+
+    <script>
+        const container = document.getElementById('status-container');
+        const checks = [];
+
+        function addStatus(name, available, details = '') {
+            const status = available ? 'ok' : 'error';
+            const icon = available ? '✓' : '✗';
+            const div = document.createElement('div');
+            div.className = `status ${status}`;
+            div.innerHTML = `
+                <strong>${icon} ${name}</strong>
+                ${details ? `<br><small>${details}</small>` : ''}
+            `;
+            container.appendChild(div);
+            return available;
+        }
+
+        // Clear container
+        container.innerHTML = '';
+
+        // Check jQuery
+        const jQueryOk = typeof jQuery !== 'undefined';
+        addStatus('jQuery', jQueryOk, jQueryOk ? `Version: ${jQuery.fn.jquery}` : 'jQuery not loaded from CDN');
+        checks.push(jQueryOk);
+
+        // Check Swal
+        const swalOk = typeof Swal !== 'undefined';
+        addStatus('SweetAlert2', swalOk, swalOk ? 'Loaded from CDN' : 'SweetAlert2 not available');
+        checks.push(swalOk);
+
+        // Check levels.js
+        const levelsOk = typeof levels !== 'undefined';
+        addStatus('Levels Data', levelsOk, levelsOk ? `Total levels: ${levels.length}` : 'levels.js not loaded');
+        checks.push(levelsOk);
+
+        // Check messages.js
+        const messagesOk = typeof messages !== 'undefined';
+        addStatus('Messages', messagesOk, messagesOk ? 'Loaded' : 'messages.js not loaded');
+        checks.push(messagesOk);
+
+        // Check game object
+        const gameOk = typeof game !== 'undefined';
+        addStatus('Game Object', gameOk, gameOk ? 'Game engine ready' : 'Game not defined');
+        checks.push(gameOk);
+
+        // Overall status
+        const allOk = checks.every(c => c);
+        const resultDiv = document.createElement('div');
+        resultDiv.className = `status ${allOk ? 'ok' : 'warn'}`;
+        resultDiv.innerHTML = `
+            <h3>${allOk ? '✓ All systems operational!' : '⚠ Some dependencies missing'}</h3>
+            ${allOk ? 
+                '<p><a href="game.html">👉 Start Game</a></p>' :
+                '<p>Check the errors above and ensure all CDN links are working.</p>'
+            }
+        `;
+        container.appendChild(resultDiv);
+
+        // Log to console
+        console.log('=== Spaceflex Dependency Check ===');
+        console.log('jQuery:', jQueryOk ? `✓ ${jQuery.fn.jquery}` : '✗ Not loaded');
+        console.log('SweetAlert2:', swalOk ? '✓ Loaded' : '✗ Not available');
+        console.log('Levels:', levelsOk ? `✓ ${levels.length} levels` : '✗ Not loaded');
+        console.log('Messages:', messagesOk ? '✓ Loaded' : '✗ Not loaded');
+        console.log('Game:', gameOk ? '✓ Ready' : '✗ Not defined');
+        console.log('Overall Status:', allOk ? '✓ READY' : '⚠ PENDING');
+    </script>
+
+    <!-- Scripts (same as game.html) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/messages.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>

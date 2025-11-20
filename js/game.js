@@ -1047,12 +1047,15 @@ loadDocs: function () {
 // INITIALIZATION
 // ===========================================
 
-$(document).ready(function() {
+function initializeGame() {
   // Initialize AlertHelper
   AlertHelper.init();
   
+  console.log('📦 Checking dependencies...');
+  console.log('jQuery available:', typeof jQuery !== 'undefined' ? '✓' : '✗');
+  console.log('Swal available:', typeof Swal !== 'undefined' ? '✓' : '✗');
+  
   // Wait for SweetAlert2 to load before starting the game
-  // This is important for GitHub Pages deployments where CDN might take time
   let checkCount = 0;
   const maxChecks = 100; // 100 * 100ms = 10 seconds
 
@@ -1075,4 +1078,13 @@ $(document).ready(function() {
   }
 
   startGameWhenReady();
-});
+}
+
+// Check if jQuery is ready
+if (typeof jQuery !== 'undefined') {
+  $(document).ready(initializeGame);
+} else {
+  // Fallback if jQuery doesn't load
+  console.error('⚠ jQuery not found, waiting...');
+  window.addEventListener('load', initializeGame);
+}
