@@ -163,36 +163,16 @@ var game = {
   // ===========================================
 
   /**
-   * Check if game is deployed on GitHub Pages
-   */
-  isDeployed: function() {
-    return window.location.hostname === 'nurkholiswakhid.github.io' || 
-           window.location.hostname === 'github.io' ||
-           window.location.protocol === 'https:' && 
-           (window.location.hostname.includes('github.io') || 
-            window.location.hostname.includes('netlify.app') ||
-            window.location.hostname.includes('vercel.app'));
-  },
-
-  /**
-   * Get deployment URL for sharing
-   */
-  getDeploymentUrl: function() {
-    return window.location.origin;
-  },
-
-  /**
    * Show player input popup
    */
   showInputPopup: function() {
     const savedName = localStorage.getItem('playerName');
     const savedAbsence = localStorage.getItem('playerAbsence');
-    const isDeployed = this.isDeployed();
 
     if (!savedName || !savedAbsence) {
-      // Check if Swal is available
-      if (typeof Swal === 'undefined') {
-        console.error('SweetAlert2 is not loaded!');
+      // Check if Swal is available and functional
+      if (typeof Swal === 'undefined' || !Swal.fire) {
+        console.error('SweetAlert2 is not loaded, using fallback');
         // Fallback to simple prompt
         const name = prompt('Enter your name:');
         const absence = prompt('Enter your absence number:');
@@ -204,73 +184,52 @@ var game = {
         return;
       }
 
-      // Show deployment notice if on GitHub
-      if (isDeployed) {
+      try {
         Swal.fire({
-          title: '🚀 Welcome to Spaceflex',
+          title: 'Welcome!',
           html: `
-            <div style="margin-bottom: 20px;">
-              <p style="font-size: 1.1em; margin-bottom: 10px;">You are playing the <strong>LIVE DEPLOYED VERSION</strong> on GitHub Pages! 🌟</p>
-              <p style="font-size: 0.9em; color: rgba(255,255,255,0.8);">Your results will be shared and saved to our servers.</p>
-            </div>
+            <input id="nameInput" class="swal2-input" placeholder="Enter your name" value="${savedName || ''}">
+            <input id="absenceInput" class="swal2-input" placeholder="Enter your absence number" value="${savedAbsence || ''}">
           `,
-          icon: 'info',
-          confirmButtonText: 'Understood',
+          confirmButtonText: 'Start Game',
+          focusConfirm: false,
+          allowOutsideClick: false,
           customClass: {
-            confirmButton: 'swal2-biru-btn',
-            popup: 'swal2-deployment-notice'
+            confirmButton: 'swal2-biru-btn'
+          },
+          preConfirm: () => {
+            const playerName = document.getElementById('nameInput').value;
+            const playerAbsence = document.getElementById('absenceInput').value;
+
+            if (!playerName || !playerAbsence) {
+              Swal.showValidationMessage('Name and absence number are required!');
+              return false;
+            }
+
+            localStorage.setItem('playerName', playerName);
+            localStorage.setItem('playerAbsence', playerAbsence);
+            location.reload();
+            return true;
           }
-        }).then(() => {
-          this.showGameStartForm(savedName, savedAbsence);
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.initializeGame();
+          }
         });
-      } else {
-        this.showGameStartForm(savedName, savedAbsence);
+      } catch (error) {
+        console.error('Error showing SweetAlert2:', error);
+        // Fallback to simple prompt
+        const name = prompt('Enter your name:');
+        const absence = prompt('Enter your absence number:');
+        if (name && absence) {
+          localStorage.setItem('playerName', name);
+          localStorage.setItem('playerAbsence', absence);
+          location.reload();
+        }
       }
     } else {
       this.initializeGame();
     }
-  },
-
-  /**
-   * Show game start form with player input
-   */
-  showGameStartForm: function(savedName = '', savedAbsence = '') {
-    Swal.fire({
-      title: 'Welcome to Spaceflex!',
-      html: `
-        <div style="text-align: left;">
-          <label style="display: block; margin-bottom: 10px; font-size: 0.9em;">Your Name:</label>
-          <input id="nameInput" class="swal2-input" placeholder="Enter your name" value="${savedName || ''}">
-          <label style="display: block; margin-bottom: 10px; margin-top: 15px; font-size: 0.9em;">Absence Number:</label>
-          <input id="absenceInput" class="swal2-input" placeholder="Enter your absence number" value="${savedAbsence || ''}">
-        </div>
-      `,
-      confirmButtonText: '🚀 Start Game',
-      focusConfirm: false,
-      allowOutsideClick: false,
-      customClass: {
-        confirmButton: 'swal2-biru-btn',
-        popup: 'swal2-enhanced-popup'
-      },
-      preConfirm: () => {
-        const playerName = document.getElementById('nameInput').value;
-        const playerAbsence = document.getElementById('absenceInput').value;
-
-        if (!playerName || !playerAbsence) {
-          Swal.showValidationMessage('❌ Name and absence number are required!');
-          return false;
-        }
-
-        localStorage.setItem('playerName', playerName);
-        localStorage.setItem('playerAbsence', playerAbsence);
-        location.reload();
-        return true;
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.initializeGame();
-      }
-    });
   },
 
   /**
@@ -331,25 +290,16 @@ var game = {
             ).join('')}</div>`
         : '<div class="empty-state">All questions answered correctly!</div>';
 
-    // Check if Swal is available
-    if (typeof Swal === 'undefined') {
+    // Check if Swal is available and functional
+    if (typeof Swal === 'undefined' || !Swal.fire) {
         console.error('SweetAlert2 is not loaded for results!');
-        alert(`Quiz Results\n\nPlayer: ${playerName}\nScore: ${score}%\nCorrect: ${correctAnswers}/${totalQuestions}`);
+        const resultMessage = `Quiz Results\n\nPlayer: ${playerName}\nScore: ${score}%\nCorrect: ${correctAnswers}/${totalQuestions}`;
+        alert(resultMessage);
         return;
     }
 
-    // Add deployment notice if on GitHub
-    const isDeployed = this.isDeployed();
-    const deploymentNotice = isDeployed ? `
-        <div style="background: linear-gradient(135deg, #00ffff15, #ff00ff15); border: 2px solid #00ffff; border-radius: 12px; padding: 12px; margin-bottom: 15px; text-align: center;">
-            <p style="margin: 0; font-size: 0.9em; color: #00ffff;">
-                ✅ <strong>Live on GitHub Pages!</strong><br>
-                Results are being saved to our server.
-            </p>
-        </div>
-    ` : '';
-
-    Swal.fire({
+    try {
+      Swal.fire({
         title: `${performanceIcon} Quiz Results`,
         html: `
             <style>
@@ -365,8 +315,6 @@ var game = {
                     font-size: 1.1em;
                 }
             </style>
-            
-            ${deploymentNotice}
             
             <div class="results-container">
                 <div class="performance-badge">
@@ -438,7 +386,13 @@ var game = {
             });
         }
     });
-},
+    } catch (error) {
+      console.error('Error showing results with SweetAlert2:', error);
+      // Fallback to simple alert
+      const resultMessage = `Quiz Results\n\nPlayer: ${playerName}\nScore: ${score}%\nCorrect: ${correctAnswers}/${totalQuestions}\nWrong: ${wrongAnswers}`;
+      alert(resultMessage);
+    }
+  },
 
 
  /**
@@ -1073,22 +1027,47 @@ loadDocs: function () {
 
 $(document).ready(function() {
   // Wait for SweetAlert2 to load before starting the game
-  // This is important for Vercel deployments where CDN might take time
+  // This is important for Vercel/GitHub Pages deployments where CDN might take time
   let checkCount = 0;
-  const maxChecks = 50; // 50 * 100ms = 5 seconds
+  const maxChecks = 100; // 100 * 100ms = 10 seconds
 
   function startGameWhenReady() {
-    if (typeof Swal !== 'undefined') {
-      // SweetAlert2 is loaded, start the game
-      console.log('SweetAlert2 loaded, starting game...');
+    if (typeof Swal !== 'undefined' && Swal.fire) {
+      // SweetAlert2 is loaded and functional, start the game
+      console.log('✓ SweetAlert2 loaded successfully, starting game...');
       game.start();
     } else if (checkCount < maxChecks) {
       checkCount++;
       // Wait 100ms and try again
       setTimeout(startGameWhenReady, 100);
     } else {
-      console.warn('SweetAlert2 did not load within 5 seconds, starting game anyway...');
-      game.start();
+      console.warn('⚠ SweetAlert2 did not load within 10 seconds');
+      // Try to load SweetAlert2 dynamically as fallback
+      if (typeof Swal === 'undefined') {
+        console.log('Loading SweetAlert2 dynamically as fallback...');
+        
+        // Load CSS
+        const cssLink = document.createElement('link');
+        cssLink.rel = 'stylesheet';
+        cssLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.0/sweetalert2.min.css';
+        document.head.appendChild(cssLink);
+        
+        // Load JS
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.0/sweetalert2.all.min.js';
+        script.onload = function() {
+          console.log('✓ SweetAlert2 loaded via fallback');
+          game.start();
+        };
+        script.onerror = function() {
+          console.error('✗ Failed to load SweetAlert2 from fallback, starting game without it');
+          game.start();
+        };
+        document.head.appendChild(script);
+      } else {
+        console.log('Starting game without full SweetAlert2 functionality');
+        game.start();
+      }
     }
   }
 
