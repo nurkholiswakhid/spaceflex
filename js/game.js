@@ -79,38 +79,6 @@ var game = {
     const savedName = localStorage.getItem('playerName');
     const savedAbsence = localStorage.getItem('playerAbsence');
 
-    // Show deployment success alert
-    if (typeof Swal !== 'undefined') {
-      const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      
-      if (!isDev) {
-        // Check if deployment alert was already shown
-        const deploymentAlertShown = sessionStorage.getItem('deploymentAlertShown');
-        
-        if (!deploymentAlertShown) {
-          Swal.fire({
-            icon: 'success',
-            title: '🚀 Spaceflex Deployed!',
-            html: `
-              <div style="text-align: left; font-size: 1.1rem;">
-                <p><strong>Selamat! 🎉</strong></p>
-                <p>Spaceflex telah berhasil di-deploy dan siap dimainkan.</p>
-                <p style="margin-top: 1rem; color: #666;">
-                  URL: <code style="background: #f0f0f0; padding: 4px 8px; border-radius: 4px;">${window.location.hostname}</code>
-                </p>
-              </div>
-            `,
-            confirmButtonText: 'Mulai Bermain!',
-            confirmButtonColor: '#00ffff',
-            allowOutsideClick: false,
-            didClose: () => {
-              sessionStorage.setItem('deploymentAlertShown', 'true');
-            }
-          });
-        }
-      }
-    }
-
     if (!savedName || !savedAbsence) {
       this.showInputPopup();
       return;
@@ -195,11 +163,31 @@ var game = {
   // ===========================================
 
   /**
+   * Check if game is deployed on GitHub Pages
+   */
+  isDeployed: function() {
+    return window.location.hostname === 'nurkholiswakhid.github.io' || 
+           window.location.hostname === 'github.io' ||
+           window.location.protocol === 'https:' && 
+           (window.location.hostname.includes('github.io') || 
+            window.location.hostname.includes('netlify.app') ||
+            window.location.hostname.includes('vercel.app'));
+  },
+
+  /**
+   * Get deployment URL for sharing
+   */
+  getDeploymentUrl: function() {
+    return window.location.origin;
+  },
+
+  /**
    * Show player input popup
    */
   showInputPopup: function() {
     const savedName = localStorage.getItem('playerName');
     const savedAbsence = localStorage.getItem('playerAbsence');
+    const isDeployed = this.isDeployed();
 
     if (!savedName || !savedAbsence) {
       // Check if Swal is available
@@ -216,40 +204,73 @@ var game = {
         return;
       }
 
-      Swal.fire({
-        title: 'Welcome!',
-        html: `
-          <input id="nameInput" class="swal2-input" placeholder="Enter your name" value="${savedName || ''}">
-          <input id="absenceInput" class="swal2-input" placeholder="Enter your absence number" value="${savedAbsence || ''}">
-        `,
-        confirmButtonText: 'Start Game',
-        focusConfirm: false,
-        allowOutsideClick: false,
-        customClass: {
-          confirmButton: 'swal2-biru-btn'
-        },
-        preConfirm: () => {
-          const playerName = document.getElementById('nameInput').value;
-          const playerAbsence = document.getElementById('absenceInput').value;
-
-          if (!playerName || !playerAbsence) {
-            Swal.showValidationMessage('Name and absence number are required!');
-            return false;
+      // Show deployment notice if on GitHub
+      if (isDeployed) {
+        Swal.fire({
+          title: '🚀 Welcome to Spaceflex',
+          html: `
+            <div style="margin-bottom: 20px;">
+              <p style="font-size: 1.1em; margin-bottom: 10px;">You are playing the <strong>LIVE DEPLOYED VERSION</strong> on GitHub Pages! 🌟</p>
+              <p style="font-size: 0.9em; color: rgba(255,255,255,0.8);">Your results will be shared and saved to our servers.</p>
+            </div>
+          `,
+          icon: 'info',
+          confirmButtonText: 'Understood',
+          customClass: {
+            confirmButton: 'swal2-biru-btn',
+            popup: 'swal2-deployment-notice'
           }
-
-          localStorage.setItem('playerName', playerName);
-          localStorage.setItem('playerAbsence', playerAbsence);
-          location.reload();
-          return true;
-        }
-      }).then((result) => {
-        if (result.isConfirmed) {
-          this.initializeGame();
-        }
-      });
+        }).then(() => {
+          this.showGameStartForm(savedName, savedAbsence);
+        });
+      } else {
+        this.showGameStartForm(savedName, savedAbsence);
+      }
     } else {
       this.initializeGame();
     }
+  },
+
+  /**
+   * Show game start form with player input
+   */
+  showGameStartForm: function(savedName = '', savedAbsence = '') {
+    Swal.fire({
+      title: 'Welcome to Spaceflex!',
+      html: `
+        <div style="text-align: left;">
+          <label style="display: block; margin-bottom: 10px; font-size: 0.9em;">Your Name:</label>
+          <input id="nameInput" class="swal2-input" placeholder="Enter your name" value="${savedName || ''}">
+          <label style="display: block; margin-bottom: 10px; margin-top: 15px; font-size: 0.9em;">Absence Number:</label>
+          <input id="absenceInput" class="swal2-input" placeholder="Enter your absence number" value="${savedAbsence || ''}">
+        </div>
+      `,
+      confirmButtonText: '🚀 Start Game',
+      focusConfirm: false,
+      allowOutsideClick: false,
+      customClass: {
+        confirmButton: 'swal2-biru-btn',
+        popup: 'swal2-enhanced-popup'
+      },
+      preConfirm: () => {
+        const playerName = document.getElementById('nameInput').value;
+        const playerAbsence = document.getElementById('absenceInput').value;
+
+        if (!playerName || !playerAbsence) {
+          Swal.showValidationMessage('❌ Name and absence number are required!');
+          return false;
+        }
+
+        localStorage.setItem('playerName', playerName);
+        localStorage.setItem('playerAbsence', playerAbsence);
+        location.reload();
+        return true;
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.initializeGame();
+      }
+    });
   },
 
   /**
@@ -317,6 +338,17 @@ var game = {
         return;
     }
 
+    // Add deployment notice if on GitHub
+    const isDeployed = this.isDeployed();
+    const deploymentNotice = isDeployed ? `
+        <div style="background: linear-gradient(135deg, #00ffff15, #ff00ff15); border: 2px solid #00ffff; border-radius: 12px; padding: 12px; margin-bottom: 15px; text-align: center;">
+            <p style="margin: 0; font-size: 0.9em; color: #00ffff;">
+                ✅ <strong>Live on GitHub Pages!</strong><br>
+                Results are being saved to our server.
+            </p>
+        </div>
+    ` : '';
+
     Swal.fire({
         title: `${performanceIcon} Quiz Results`,
         html: `
@@ -333,6 +365,8 @@ var game = {
                     font-size: 1.1em;
                 }
             </style>
+            
+            ${deploymentNotice}
             
             <div class="results-container">
                 <div class="performance-badge">
