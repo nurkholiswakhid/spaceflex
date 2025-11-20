@@ -3,30 +3,6 @@
  * A web-based game for learning CSS with timer functionality
  */
 
-// Ensure SweetAlert2 is available
-function ensureSweetAlert() {
-  return new Promise((resolve, reject) => {
-    if (typeof Swal !== 'undefined') {
-      resolve(true);
-    } else {
-      console.warn('SweetAlert2 not yet loaded, waiting...');
-      let attempts = 0;
-      const checkInterval = setInterval(() => {
-        if (typeof Swal !== 'undefined') {
-          clearInterval(checkInterval);
-          console.log('SweetAlert2 is now available');
-          resolve(true);
-        }
-        attempts++;
-        if (attempts > 50) { // 5 seconds timeout
-          clearInterval(checkInterval);
-          console.error('SweetAlert2 failed to load');
-          reject(false);
-        }
-      }, 100);
-    }
-  });
-}
 
 var game = {
   
@@ -102,6 +78,38 @@ var game = {
   start: function() {
     const savedName = localStorage.getItem('playerName');
     const savedAbsence = localStorage.getItem('playerAbsence');
+
+    // Show deployment success alert
+    if (typeof Swal !== 'undefined') {
+      const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      
+      if (!isDev) {
+        // Check if deployment alert was already shown
+        const deploymentAlertShown = sessionStorage.getItem('deploymentAlertShown');
+        
+        if (!deploymentAlertShown) {
+          Swal.fire({
+            icon: 'success',
+            title: '🚀 Spaceflex Deployed!',
+            html: `
+              <div style="text-align: left; font-size: 1.1rem;">
+                <p><strong>Selamat! 🎉</strong></p>
+                <p>Spaceflex telah berhasil di-deploy dan siap dimainkan.</p>
+                <p style="margin-top: 1rem; color: #666;">
+                  URL: <code style="background: #f0f0f0; padding: 4px 8px; border-radius: 4px;">${window.location.hostname}</code>
+                </p>
+              </div>
+            `,
+            confirmButtonText: 'Mulai Bermain!',
+            confirmButtonColor: '#00ffff',
+            allowOutsideClick: false,
+            didClose: () => {
+              sessionStorage.setItem('deploymentAlertShown', 'true');
+            }
+          });
+        }
+      }
+    }
 
     if (!savedName || !savedAbsence) {
       this.showInputPopup();
@@ -189,47 +197,14 @@ var game = {
   /**
    * Show player input popup
    */
-  showInputPopup: async function() {
+  showInputPopup: function() {
     const savedName = localStorage.getItem('playerName');
     const savedAbsence = localStorage.getItem('playerAbsence');
 
     if (!savedName || !savedAbsence) {
-      try {
-        await ensureSweetAlert();
-        
-        Swal.fire({
-          title: 'Welcome!',
-          html: `
-            <input id="nameInput" class="swal2-input" placeholder="Enter your name" value="${savedName || ''}">
-            <input id="absenceInput" class="swal2-input" placeholder="Enter your absence number" value="${savedAbsence || ''}">
-          `,
-          confirmButtonText: 'Start Game',
-          focusConfirm: false,
-          allowOutsideClick: false,
-          customClass: {
-            confirmButton: 'swal2-biru-btn'
-          },
-          preConfirm: () => {
-            const playerName = document.getElementById('nameInput').value;
-            const playerAbsence = document.getElementById('absenceInput').value;
-
-            if (!playerName || !playerAbsence) {
-              Swal.showValidationMessage('Name and absence number are required!');
-              return false;
-            }
-
-            localStorage.setItem('playerName', playerName);
-            localStorage.setItem('playerAbsence', playerAbsence);
-            location.reload();
-            return true;
-          }
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.initializeGame();
-          }
-        });
-      } catch (error) {
-        console.error('SweetAlert2 error:', error);
+      // Check if Swal is available
+      if (typeof Swal === 'undefined') {
+        console.error('SweetAlert2 is not loaded!');
         // Fallback to simple prompt
         const name = prompt('Enter your name:');
         const absence = prompt('Enter your absence number:');
@@ -238,7 +213,40 @@ var game = {
           localStorage.setItem('playerAbsence', absence);
           location.reload();
         }
+        return;
       }
+
+      Swal.fire({
+        title: 'Welcome!',
+        html: `
+          <input id="nameInput" class="swal2-input" placeholder="Enter your name" value="${savedName || ''}">
+          <input id="absenceInput" class="swal2-input" placeholder="Enter your absence number" value="${savedAbsence || ''}">
+        `,
+        confirmButtonText: 'Start Game',
+        focusConfirm: false,
+        allowOutsideClick: false,
+        customClass: {
+          confirmButton: 'swal2-biru-btn'
+        },
+        preConfirm: () => {
+          const playerName = document.getElementById('nameInput').value;
+          const playerAbsence = document.getElementById('absenceInput').value;
+
+          if (!playerName || !playerAbsence) {
+            Swal.showValidationMessage('Name and absence number are required!');
+            return false;
+          }
+
+          localStorage.setItem('playerName', playerName);
+          localStorage.setItem('playerAbsence', playerAbsence);
+          location.reload();
+          return true;
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.initializeGame();
+        }
+      });
     } else {
       this.initializeGame();
     }
@@ -305,12 +313,7 @@ var game = {
     // Check if Swal is available
     if (typeof Swal === 'undefined') {
         console.error('SweetAlert2 is not loaded for results!');
-        // Wait for SweetAlert2 to load
-        ensureSweetAlert().then(() => {
-            this.showResults();
-        }).catch(() => {
-            alert(`Quiz Results\n\nPlayer: ${playerName}\nScore: ${score}%\nCorrect: ${correctAnswers}/${totalQuestions}`);
-        });
+        alert(`Quiz Results\n\nPlayer: ${playerName}\nScore: ${score}%\nCorrect: ${correctAnswers}/${totalQuestions}`);
         return;
     }
 

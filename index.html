@@ -23,6 +23,10 @@
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/responsive.css">
 
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.0/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.0/dist/sweetalert2.all.min.js"></script>
+
     <!-- Structured Data -->
     <script type="application/ld+json">
     {
@@ -785,6 +789,37 @@
                     });
                 });
             });
+        });
+
+        // Show deployment alert when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                
+                if (!isDev && typeof Swal !== 'undefined') {
+                    const deploymentAlertShown = sessionStorage.getItem('indexDeploymentAlertShown');
+                    
+                    if (!deploymentAlertShown) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '🚀 Spaceflex Live!',
+                            html: `
+                                <div style="text-align: center; font-size: 1.05rem;">
+                                    <p style="margin-bottom: 1rem;"><strong>✨ Berhasil Di-Deploy! ✨</strong></p>
+                                    <p style="color: #666; margin-bottom: 0.5rem;">Spaceflex kini sudah live dan siap dimainkan.</p>
+                                    <p style="color: #666; font-size: 0.95rem;">Selamat datang di misi pembelajaran CSS Flexbox!</p>
+                                </div>
+                            `,
+                            confirmButtonText: 'Asik!',
+                            confirmButtonColor: '#00ffff',
+                            position: 'center',
+                            didClose: () => {
+                                sessionStorage.setItem('indexDeploymentAlertShown', 'true');
+                            }
+                        });
+                    }
+                }
+            }, 1000);
         });
     </script>
 
