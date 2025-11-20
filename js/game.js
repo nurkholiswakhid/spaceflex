@@ -3,6 +3,27 @@
  * A web-based game for learning CSS with timer functionality
  */
 
+// SweetAlert2 compatibility check and fallback
+var AlertHelper = {
+  hasSweetAlert: false,
+  init: function() {
+    this.hasSweetAlert = typeof Swal !== 'undefined';
+  },
+  fire: function(options) {
+    if (this.hasSweetAlert) {
+      return Swal.fire(options);
+    } else {
+      this.fallbackAlert(options);
+      return Promise.resolve();
+    }
+  },
+  fallbackAlert: function(options) {
+    // Simple fallback for when SweetAlert2 is not available
+    const title = options.title || '';
+    const message = options.html || options.text || '';
+    alert(title + '\n\n' + message.replace(/<[^>]*>/g, ''));
+  }
+};
 
 var game = {
   
@@ -170,10 +191,9 @@ var game = {
     const savedAbsence = localStorage.getItem('playerAbsence');
 
     if (!savedName || !savedAbsence) {
-      // Check if Swal is available and functional
-      if (typeof Swal === 'undefined' || !Swal.fire) {
-        console.error('SweetAlert2 is not loaded, using fallback');
-        // Fallback to simple prompt
+      // Check if Swal is available
+      if (typeof Swal === 'undefined') {
+        console.warn('SweetAlert2 is not loaded, using fallback');
         const name = prompt('Enter your name:');
         const absence = prompt('Enter your absence number:');
         if (name && absence) {
@@ -216,9 +236,8 @@ var game = {
             this.initializeGame();
           }
         });
-      } catch (error) {
-        console.error('Error showing SweetAlert2:', error);
-        // Fallback to simple prompt
+      } catch (e) {
+        console.error('Error with SweetAlert2:', e);
         const name = prompt('Enter your name:');
         const absence = prompt('Enter your absence number:');
         if (name && absence) {
@@ -270,130 +289,129 @@ var game = {
         performanceIcon = '💪';
     }
 
-    const correctDetails = this.solved.length > 0
-        ? `<div class="question-list correct-list">${this.solved.map(q => 
-            `<div class="question-item correct-item">
-                <span class="question-icon">✅</span>
-                <span class="question-text">${q}</span>
-            </div>`
-        ).join('')}</div>`
-        : '<div class="empty-state">No correct answers</div>';
-
-    const wrongDetails = totalQuestions > 0
-        ? `<div class="question-list wrong-list">${levels.map(level => level.name)
-            .filter(name => !this.solved.includes(name))
-            .map(q => 
-                `<div class="question-item wrong-item">
-                    <span class="question-icon">❌</span>
-                    <span class="question-text">${q}</span>
-                </div>`
-            ).join('')}</div>`
-        : '<div class="empty-state">All questions answered correctly!</div>';
-
-    // Check if Swal is available and functional
-    if (typeof Swal === 'undefined' || !Swal.fire) {
-        console.error('SweetAlert2 is not loaded for results!');
-        const resultMessage = `Quiz Results\n\nPlayer: ${playerName}\nScore: ${score}%\nCorrect: ${correctAnswers}/${totalQuestions}`;
-        alert(resultMessage);
+    // Check if Swal is available
+    if (typeof Swal === 'undefined') {
+        console.warn('SweetAlert2 is not loaded for results, using fallback');
+        const resultText = `QUIZ RESULTS\n\nPlayer: ${playerName}\nAbsence: ${playerAbsence}\nScore: ${score}%\nCorrect: ${correctAnswers}/${totalQuestions}`;
+        alert(resultText);
+        this.saveResults(score);
         return;
     }
-
     try {
+      const correctDetails = this.solved.length > 0
+          ? `<div class="question-list correct-list">${this.solved.map(q => 
+              `<div class="question-item correct-item">
+                  <span class="question-icon">✅</span>
+                  <span class="question-text">${q}</span>
+              </div>`
+          ).join('')}</div>`
+          : '<div class="empty-state">No correct answers</div>';
+
+      const wrongDetails = totalQuestions > 0
+          ? `<div class="question-list wrong-list">${levels.map(level => level.name)
+              .filter(name => !this.solved.includes(name))
+              .map(q => 
+                  `<div class="question-item wrong-item">
+                      <span class="question-icon">❌</span>
+                      <span class="question-text">${q}</span>
+                  </div>`
+              ).join('')}</div>`
+          : '<div class="empty-state">All questions answered correctly!</div>';
+
       Swal.fire({
-        title: `${performanceIcon} Quiz Results`,
-        html: `
-            <style>
-                .performance-badge {
-                    background: linear-gradient(135deg, ${performanceColor}15, ${performanceColor}25);
-                    border: 2px solid ${performanceColor};
-                    border-radius: 25px;
-                    padding: 12px 20px;
-                    margin: 15px 0;
-                    text-align: center;
-                    font-weight: bold;
-                    color: ${performanceColor};
-                    font-size: 1.1em;
-                }
-            </style>
-            
-            <div class="results-container">
-                <div class="performance-badge">
-                    ${performanceLevel} Your score: ${score}%
-                </div>
-                
-                <div class="player-info">
-                    <div class="player-row">
-                        <span class="player-label"> Player Name:</span>
-                        <span class="player-value">${playerName}</span>
-                    </div>
-                    <div class="player-row">
-                        <span class="player-label"> Absence Number:</span>
-                        <span class="player-value">${playerAbsence}</span>
-                    </div>
-                </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value score-value">${score}%</div>
-                        <div class="stat-label">Final Score</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value total-value">${totalQuestions}</div>
-                        <div class="stat-label">Total Questions</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value correct-value">${correctAnswers}</div>
-                        <div class="stat-label">Correct Answers</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value wrong-value">${wrongAnswers}</div>
-                        <div class="stat-label">Wrong Answers</div>
-                    </div>
-                </div>
-                
-                <div class="section-divider"></div>
-                
-                <div class="section-title correct-title">✅ Correct Questions (${correctAnswers})</div>
-                ${correctDetails}
-                
-                <div class="section-title wrong-title">❌ Wrong Questions (${wrongAnswers})</div>
-                ${wrongDetails}
-            </div>
-        `,
-        showCancelButton: true,
-        focusConfirm: false,
-        allowOutsideClick: false,
-        confirmButtonText: '🔄 Play Again',
-        cancelButtonText: '📤 Share Results',
-        customClass: {
-            confirmButton: 'swal2-krem-btn',
-            cancelButton: 'swal2-biru-btn',
-            popup: 'swal2-enhanced-popup'
-        },
-        preConfirm: () => this.resetGame()
-    }).then((result) => {
-        if (result.isDismissed) {
-            this.shareResults({
-                playerName, 
-                playerAbsence, 
-                score, 
-                totalQuestions,
-                correctAnswers, 
-                wrongAnswers,
-                performanceLevel,
-                correctDetails: this.solved.join(', ') || 'None',
-                wrongDetails: levels.map(level => level.name).filter(name => !this.solved.includes(name)).join(', ') || 'None'
-            });
-        }
-    });
-    } catch (error) {
-      console.error('Error showing results with SweetAlert2:', error);
-      // Fallback to simple alert
-      const resultMessage = `Quiz Results\n\nPlayer: ${playerName}\nScore: ${score}%\nCorrect: ${correctAnswers}/${totalQuestions}\nWrong: ${wrongAnswers}`;
-      alert(resultMessage);
+          title: `${performanceIcon} Quiz Results`,
+          html: `
+              <style>
+                  .performance-badge {
+                      background: linear-gradient(135deg, ${performanceColor}15, ${performanceColor}25);
+                      border: 2px solid ${performanceColor};
+                      border-radius: 25px;
+                      padding: 12px 20px;
+                      margin: 15px 0;
+                      text-align: center;
+                      font-weight: bold;
+                      color: ${performanceColor};
+                      font-size: 1.1em;
+                  }
+              </style>
+              
+              <div class="results-container">
+                  <div class="performance-badge">
+                      ${performanceLevel} Your score: ${score}%
+                  </div>
+                  
+                  <div class="player-info">
+                      <div class="player-row">
+                          <span class="player-label"> Player Name:</span>
+                          <span class="player-value">${playerName}</span>
+                      </div>
+                      <div class="player-row">
+                          <span class="player-label"> Absence Number:</span>
+                          <span class="player-value">${playerAbsence}</span>
+                      </div>
+                  </div>
+                  
+                  <div class="stats-grid">
+                      <div class="stat-card">
+                          <div class="stat-value score-value">${score}%</div>
+                          <div class="stat-label">Final Score</div>
+                      </div>
+                      <div class="stat-card">
+                          <div class="stat-value total-value">${totalQuestions}</div>
+                          <div class="stat-label">Total Questions</div>
+                      </div>
+                      <div class="stat-card">
+                          <div class="stat-value correct-value">${correctAnswers}</div>
+                          <div class="stat-label">Correct Answers</div>
+                      </div>
+                      <div class="stat-card">
+                          <div class="stat-value wrong-value">${wrongAnswers}</div>
+                          <div class="stat-label">Wrong Answers</div>
+                      </div>
+                  </div>
+                  
+                  <div class="section-divider"></div>
+                  
+                  <div class="section-title correct-title">✅ Correct Questions (${correctAnswers})</div>
+                  ${correctDetails}
+                  
+                  <div class="section-title wrong-title">❌ Wrong Questions (${wrongAnswers})</div>
+                  ${wrongDetails}
+              </div>
+          `,
+          showCancelButton: true,
+          focusConfirm: false,
+          allowOutsideClick: false,
+          confirmButtonText: '🔄 Play Again',
+          cancelButtonText: '📤 Share Results',
+          customClass: {
+              confirmButton: 'swal2-krem-btn',
+              cancelButton: 'swal2-biru-btn',
+              popup: 'swal2-enhanced-popup'
+          },
+          preConfirm: () => this.resetGame()
+      }).then((result) => {
+          if (result.isDismissed) {
+              this.shareResults({
+                  playerName, 
+                  playerAbsence, 
+                  score, 
+                  totalQuestions,
+                  correctAnswers, 
+                  wrongAnswers,
+                  performanceLevel,
+                  correctDetails: this.solved.join(', ') || 'None',
+                  wrongDetails: levels.map(level => level.name).filter(name => !this.solved.includes(name)).join(', ') || 'None'
+              });
+          }
+      });
+    } catch (e) {
+      console.error('Error showing results with SweetAlert2:', e);
+      const resultText = `QUIZ RESULTS\n\nPlayer: ${playerName}\nAbsence: ${playerAbsence}\nScore: ${score}%\nCorrect: ${correctAnswers}/${totalQuestions}`;
+      alert(resultText);
+      this.saveResults(score);
     }
   },
-
 
  /**
  * Generate progress dots with numbers and sync with level navigation
@@ -474,7 +492,11 @@ generateProgressDots: function () {
     })
     .catch((error) => {
       console.error('Error saving data:', error);
-      Swal.fire('Error', 'Failed to save results. Please try again.', 'error');
+      if (typeof Swal !== 'undefined') {
+        Swal.fire('Error', 'Failed to save results. Please try again.', 'error');
+      } else {
+        alert('Error: Failed to save results. Please try again.');
+      }
     });
   },
 
@@ -1026,48 +1048,29 @@ loadDocs: function () {
 // ===========================================
 
 $(document).ready(function() {
+  // Initialize AlertHelper
+  AlertHelper.init();
+  
   // Wait for SweetAlert2 to load before starting the game
-  // This is important for Vercel/GitHub Pages deployments where CDN might take time
+  // This is important for GitHub Pages deployments where CDN might take time
   let checkCount = 0;
   const maxChecks = 100; // 100 * 100ms = 10 seconds
 
   function startGameWhenReady() {
-    if (typeof Swal !== 'undefined' && Swal.fire) {
-      // SweetAlert2 is loaded and functional, start the game
-      console.log('✓ SweetAlert2 loaded successfully, starting game...');
+    if (typeof Swal !== 'undefined') {
+      // SweetAlert2 is loaded
+      AlertHelper.hasSweetAlert = true;
+      console.log('✓ SweetAlert2 loaded successfully');
       game.start();
     } else if (checkCount < maxChecks) {
       checkCount++;
       // Wait 100ms and try again
       setTimeout(startGameWhenReady, 100);
     } else {
-      console.warn('⚠ SweetAlert2 did not load within 10 seconds');
-      // Try to load SweetAlert2 dynamically as fallback
-      if (typeof Swal === 'undefined') {
-        console.log('Loading SweetAlert2 dynamically as fallback...');
-        
-        // Load CSS
-        const cssLink = document.createElement('link');
-        cssLink.rel = 'stylesheet';
-        cssLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.0/sweetalert2.min.css';
-        document.head.appendChild(cssLink);
-        
-        // Load JS
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.0/sweetalert2.all.min.js';
-        script.onload = function() {
-          console.log('✓ SweetAlert2 loaded via fallback');
-          game.start();
-        };
-        script.onerror = function() {
-          console.error('✗ Failed to load SweetAlert2 from fallback, starting game without it');
-          game.start();
-        };
-        document.head.appendChild(script);
-      } else {
-        console.log('Starting game without full SweetAlert2 functionality');
-        game.start();
-      }
+      // Timeout - SweetAlert2 might not be available
+      console.warn('⚠ SweetAlert2 did not load within 10 seconds, using fallback');
+      AlertHelper.hasSweetAlert = false;
+      game.start();
     }
   }
 
